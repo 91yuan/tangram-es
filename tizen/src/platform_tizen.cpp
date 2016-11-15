@@ -154,6 +154,9 @@ void initPlatformFontSetup() {
 }
 
 std::vector<FontSourceHandle> systemFontFallbacksHandle() {
+
+    initPlatformFontSetup();
+
     std::vector<FontSourceHandle> handles;
 
     for (auto path : s_fallbackFonts) {
@@ -162,9 +165,14 @@ std::vector<FontSourceHandle> systemFontFallbacksHandle() {
             size_t dataSize = 0;
 
             auto cdata = bytesFromFile(path.c_str(), dataSize);
+
+            if (!cdata) { return {}; }
+
             auto data = std::vector<char>(cdata, cdata + dataSize);
 
-            return std::move(data);
+            free(cdata);
+
+            return data;
         };
 
         handles.push_back(fontSourceHandle);
